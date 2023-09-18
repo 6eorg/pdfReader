@@ -17,7 +17,7 @@ function start() {
 
     Array.from(files).forEach(async file => {
         pagesContaininingSearchTerms = new Set();
-        const fileName = file.name.trim('.pdf')
+        const fileName = file.name.replace('.pdf', '');
 
         await convertPdfToArrayBuffer(file).then(
             async (resp) => {
