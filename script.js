@@ -1,5 +1,6 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+    './pdf.worker.js';
+
 
 let searchTerms;
 let files;
