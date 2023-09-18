@@ -148,7 +148,7 @@ function cloneArrayBuffer(buffer) {
 
 function findSearchTermsInPage(text, pageNr, searchTerms) {
     searchTerms.forEach(term => {
-        if (text.includes(term)) {
+        if (text.toLowerCase().includes(term.toLowerCase())) {
             console.log("found: ", term, "on page ", pageNr)
             pagesContaininingSearchTerms.add(pageNr);
         }
