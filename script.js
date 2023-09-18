@@ -4,6 +4,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 let searchTerms;
 let files;
 
+let findings = []
 
 
 function start() {
@@ -14,7 +15,11 @@ function start() {
 
 
     convertPdfToArrayBuffer(files[0]).then(
-        (resp) => {
+        async (resp) => {
+
+            let clonedArrayBuffer = cloneArrayBuffer(resp)
+            //extractPageAndDownload(resp, 0)
+
             console.log(resp)
             //shape into readable object
             src = { data: resp };
@@ -23,6 +28,16 @@ function start() {
             extractText(src).then(
                 function (text) {
                     console.log('parse ' + text);
+
+
+                    //download pages
+                    console.log("Seiten, auf denen das Wort vorkommt:", findings)
+
+                    extractPageAndDownload(clonedArrayBuffer, 0)
+
+
+
+
                 },
                 function (reason) {
                     console.error(reason);
@@ -51,6 +66,7 @@ async function convertPdfToArrayBuffer(file) {
 }
 
 function extractText(pdfUrl) {
+    let pageNr = 0;
     var pdf = pdfjsLib.getDocument(pdfUrl);
     return pdf.promise.then(function (pdf) {
         var totalPageCount = pdf.numPages;
@@ -62,7 +78,10 @@ function extractText(pdfUrl) {
         ) {
             var page = pdf.getPage(currentPage);
             countPromises.push(
-                page.then(function (page) {
+                page.then(async function (page) {
+
+                           
+
                     var textContent = page.getTextContent();
                     return textContent.then(function (text) {
                         return text.items
@@ -70,7 +89,18 @@ function extractText(pdfUrl) {
                                 return s.str;
                             })
                             .join('');
-                    });
+                    }).then(text => {
+                      
+                        console.log("text for page: ", pageNr);
+                        console.log("text for this page", text)
+                        if (text.includes("Georg")){
+                            findings.push(pageNr);
+                        }
+                        
+
+                        pageNr++;
+                    }
+                    );
                 }),
             );
         }
@@ -83,3 +113,53 @@ function extractText(pdfUrl) {
 
 
 
+function renderPage(page) {
+    var scale = 1;
+    var viewport = page.getViewport({scale: scale});
+
+    // Prepare canvas using PDF page dimensions
+    var canvas = document.getElementById('the-canvas');
+    var context = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    // Render PDF page into canvas context
+    var renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    };
+    var renderTask = page.render(renderContext);
+    renderTask.promise.then(function () {
+      console.log('Page rendered');
+    });
+  };
+
+
+
+  async function extractPageAndDownload(pdfAsArrayBuffer, page){
+
+        
+            const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
+            const newPdfDoc = await PDFLib.PDFDocument.create();
+            const copied = await newPdfDoc.copyPages(srcDoc, [page])
+            newPdfDoc.addPage(copied[0])
+
+            const pdfBytes = await newPdfDoc.save()
+
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'page_1.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+    
+  }
+
+  function cloneArrayBuffer(buffer) {
+    const clone = new Uint8Array(buffer.byteLength);
+    clone.set(new Uint8Array(buffer));
+    return clone.buffer;
+}
