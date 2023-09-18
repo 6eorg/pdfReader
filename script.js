@@ -1,3 +1,5 @@
+
+
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     './pdf.worker.js';
 
@@ -6,6 +8,12 @@ let searchTerms;
 let files;
 
 let pagesContaininingSearchTerms;
+class Entry {
+    constructor(page, terms) {
+      this.page = page;
+      this.terms = terms;
+    }
+  }
 
 
 function start() {
@@ -16,7 +24,7 @@ function start() {
 
 
     Array.from(files).forEach(async file => {
-        pagesContaininingSearchTerms = new Set();
+        pagesContaininingSearchTerms = new Array();
         const fileName = file.name.replace('.pdf', '');
 
         await convertPdfToArrayBuffer(file).then(
@@ -37,11 +45,10 @@ function start() {
                         //download pages
                         console.log("Ergebnisse Wortsuche :", pagesContaininingSearchTerms)
 
-                        const pages = Array.from(pagesContaininingSearchTerms)
 
-                        for (let i = 0; i < pages.length; i++) {
+                        for (let i = 0; i < pagesContaininingSearchTerms.length; i++) {
                             console.log("loopover and download")
-                            await extractPageAndDownload(clonedArrayBuffer, pages[i], fileName)
+                            await extractPageAndDownload(clonedArrayBuffer, pagesContaininingSearchTerms[i], fileName)
                         }
 
                     },
@@ -117,12 +124,19 @@ function extractText(pdfUrl) {
 
 
 
-async function extractPageAndDownload(pdfAsArrayBuffer, page, fileName) {
+async function extractPageAndDownload(pdfAsArrayBuffer, entry, fileName) {
 
     const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
     const newPdfDoc = await PDFLib.PDFDocument.create();
-    const copied = await newPdfDoc.copyPages(srcDoc, [page])
-    newPdfDoc.addPage(copied[0])
+    const copied = await newPdfDoc.copyPages(srcDoc, [entry.page])
+    let p = newPdfDoc.addPage(copied[0])
+    let {height, width} = p.getSize();
+    p.drawText(entry.terms.join(', '),  {
+        x: 20,
+        y: height - 20,
+        size: 10,
+      })
+  
 
     const pdfBytes = await newPdfDoc.save()
 
@@ -131,7 +145,7 @@ async function extractPageAndDownload(pdfAsArrayBuffer, page, fileName) {
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = url;
-    a.download = fileName + '_page_' + page + '.pdf';
+    a.download = fileName + '_page_' + entry.page + '.pdf';
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
@@ -148,10 +162,14 @@ function cloneArrayBuffer(buffer) {
 
 
 function findSearchTermsInPage(text, pageNr, searchTerms) {
+    let termsOnPage = []
     searchTerms.forEach(term => {
         if (text.toLowerCase().includes(term.toLowerCase())) {
-            console.log("found: ", term, "on page ", pageNr)
-            pagesContaininingSearchTerms.add(pageNr);
+            termsOnPage.push(term)
         }
     })
+
+    if (termsOnPage.length > 0) {
+        pagesContaininingSearchTerms.push(new Entry(pageNr, termsOnPage));
+    }
 }
