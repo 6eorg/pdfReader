@@ -29,8 +29,8 @@ function start() {
     files = document.getElementById('input-files').files
     const p = document.getElementById('error');
 
-    if (files.length === 0){
-        p.innerText =  "kein File ausgewählt"
+    if (files.length === 0) {
+        p.innerText = "kein File ausgewählt"
         return
     } else {
         p.innerText = ""
@@ -111,12 +111,12 @@ async function extractTextAndFindOccurences(pdfUrl, fileName) {
         console.log("text on page: ", currentPage, "text: ", text);
         //entry for this page (in array, so it just returns and add empty, when nothing found)
         const pageEntries = findSearchTermsInPage(text, currentPage, searchMap, fileName);
-        
+
         localEntries = localEntries.concat(pageEntries);
     }
 
     //all entries in this pdf
-    return localEntries; 
+    return localEntries;
 }
 
 function buildZip(entries, totalWeight) {
@@ -157,7 +157,7 @@ async function extractPageAndAddToEntry(pdfAsArrayBuffer, entry) {
 
     const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
     const newPdfDoc = await PDFLib.PDFDocument.create();
-    const copied = await newPdfDoc.copyPages(srcDoc, [entry.page-1])
+    const copied = await newPdfDoc.copyPages(srcDoc, [entry.page - 1])
     let p = newPdfDoc.addPage(copied[0])
     let { height, width } = p.getSize();
     p.drawText(entry.terms.join(', '), {
@@ -240,16 +240,16 @@ async function loadSettingsFile() {
     let text = await readSettings()
     text = text.toString()
     searchMap = new Map();
-    let params =  text.split('\n').map(entry => entry.trim())
+    let params = text.split('\n').map(entry => entry.trim())
     console.log(params)
     //loop over params¨
-    params.forEach(entry =>{
+    params.forEach(entry => {
         let [term, weight] = entry.split(',');
         searchMap.set(term, Number(weight))
     })
     console.log("searchmap:", searchMap)
-    
-    
+
+
     buildRangeSlider(searchMap)
 
 }
@@ -259,7 +259,7 @@ async function loadSettingsFile() {
 
 //slider
 
-function initializeSlider(){
+function initializeSlider() {
 
     //check which radio button
     radios = document.getElementsByName('radio-source');
@@ -275,22 +275,22 @@ function initializeSlider(){
             searchMap.set(word, 5)
         })
         buildRangeSlider(searchMap)
-    } else{
+    } else {
         loadSettingsFile()
     }
 
 }
 
-function buildRangeSlider(map){
+function buildRangeSlider(map) {
     text = "<table>"
 
-    for(let [key, value] of map){
-        text += `<tr><td>${key}</td><td><input type="range" min="1" max="50" value=${value} onInput="updateSlider(event)"  class="slider" id="${key}"> <span id ="slider-span-${key}">${value}</span></td></tr>`
+    for (let [key, value] of map) {
+        text += `<tr><td>${key}</td><td><input type="range" min="0" max="50" value=${value} onInput="updateSlider(event)"  class="slider" id="${key}"> <span id ="slider-span-${key}">${value}</span></td></tr>`
     }
 
     text += "</table>"
 
-    const div =  document.getElementById('slider-container')
+    const div = document.getElementById('slider-container')
     console.log("div", div)
     div.innerHTML = text;
 
@@ -302,7 +302,7 @@ function updateSlider(event) {
 }
 
 
-function buildHashMapFromRangeSliderValues(){
+function buildHashMapFromRangeSliderValues() {
 
     //reset map
     searchMap = new Map()
@@ -313,7 +313,10 @@ function buildHashMapFromRangeSliderValues(){
     Array.from(inputs).forEach(entry => {
         key = entry.id
         value = Number(entry.value)
-        searchMap.set(key, value)
+        if (value > 0) {
+            searchMap.set(key, value)
+        }
+
     })
     console.log("created map from slider: ", searchMap)
     return searchMap;
@@ -371,7 +374,7 @@ function downloadPdf(entry) {
 
 function showFoundEntries(entries) {
 
-    entries.sort((a, b) => {return a.weight < b.weight})
+    entries.sort((a, b) => { return a.weight < b.weight })
 
     text = "<h1>Suchresultate:</h1><br><table><tr><th>PDF:</th><th>Seite:</th><th>gefundene Wörter</th><th>Gewichtung</th><th>Direktlink</th></tr>"
 
