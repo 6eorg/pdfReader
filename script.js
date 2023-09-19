@@ -44,7 +44,8 @@ function start() {
         .then(result => {
             // All files have been processed at this point
             console.log("All files processed", result);
-            const entriesList = result[result.length - 1];
+            let entriesList = Array.from(new Set(result.flat()));
+
             console.log("list with entries:", entriesList)
             const totalWeight = entriesList.reduce((result, entry) => result + entry.weight, 0);
             console.log("sum weight: ", totalWeight)
