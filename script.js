@@ -74,7 +74,7 @@ async function processFile(file) {
     let src = { data: resp };
 
     //extract text and add entries with findings
-    let entriesForPdf = await extractText(src, fileName);
+    let entriesForPdf = await extractTextAndFindOccurences(src, fileName);
 
 
     console.log("entries found in pdf :", entriesForPdf);
@@ -98,46 +98,24 @@ async function convertPdfToArrayBuffer(file) {
     });
 }
 
-function extractText(pdfUrl, fileName) {
-    let pageNr = 0;
-    var pdf = pdfjsLib.getDocument(pdfUrl);
-    return pdf.promise.then(function (pdf) {
-        //empty array for each pdf
-        entries = new Array()
-        var totalPageCount = pdf.numPages;
-        var countPromises = [];
-        for (
-            var currentPage = 1;
-            currentPage <= totalPageCount;
-            currentPage++
-        ) {
-            var page = pdf.getPage(currentPage);
-            countPromises.push(
-                page.then(async function (page) {
+async function extractTextAndFindOccurences(pdfUrl, fileName) {
+    const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+    const totalPageCount = pdf.numPages;
+    let localEntries = [];
 
+    for (let currentPage = 1; currentPage <= totalPageCount; currentPage++) {
+        const page = await pdf.getPage(currentPage);
+        const textContent = await page.getTextContent();
+        const text = textContent.items.map(s => s.str).join('');
+        console.log("text on page: ", currentPage, "text: ", text);
+        //entry for this page (in array, so it just returns and add empty, when nothing found)
+        const pageEntries = findSearchTermsInPage(text, currentPage, searchMap, fileName);
+        
+        localEntries = localEntries.concat(pageEntries);
+    }
 
-                    var textContent = page.getTextContent();
-                    return textContent.then(function (text) {
-                        return text.items
-                            .map(function (s) {
-                                return s.str;
-                            })
-                            .join('');
-                    }).then(text => {
-                        console.log("text on page: ", pageNr, "text: ", text)
-                        findSearchTermsInPage(text, pageNr, searchMap, fileName);
-                        pageNr++;
-                        return text;
-                    }
-                    );
-                }),
-            );
-        }
-
-        return Promise.all(countPromises).then(function () {
-            return entries;
-        });
-    });
+    //all entries in this pdf
+    return localEntries; 
 }
 
 function buildZip(entries, totalWeight) {
@@ -178,7 +156,7 @@ async function extractPageAndAddToEntry(pdfAsArrayBuffer, entry) {
 
     const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
     const newPdfDoc = await PDFLib.PDFDocument.create();
-    const copied = await newPdfDoc.copyPages(srcDoc, [entry.page])
+    const copied = await newPdfDoc.copyPages(srcDoc, [entry.page-1])
     let p = newPdfDoc.addPage(copied[0])
     let { height, width } = p.getSize();
     p.drawText(entry.terms.join(', '), {
@@ -204,6 +182,7 @@ function cloneArrayBuffer(buffer) {
 function findSearchTermsInPage(text, pageNr, searchMap, fileName) {
     let termsOnPage = []
     let totalWeight = 0;
+    let localEntries = []
 
     for (let [term, weight] of searchMap) {
         if (text.toLowerCase().includes(term.toLowerCase())) {
@@ -216,9 +195,11 @@ function findSearchTermsInPage(text, pageNr, searchMap, fileName) {
     }
 
     if (termsOnPage.length > 0) {
-        entries.push(new Entry(pageNr, termsOnPage, fileName, totalWeight));
+        localEntries.push(new Entry(pageNr, termsOnPage, fileName, totalWeight));
         console.log(" entries array: ", entries)
     }
+    console.log("local entries on page: ", pageNr, localEntries)
+    return localEntries
 }
 
 
