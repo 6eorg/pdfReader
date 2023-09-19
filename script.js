@@ -28,7 +28,14 @@ function start() {
     searchTerms = document.getElementById('input-search').value.split(',').map(term => term.trim())
     console.log("search terms: ", searchTerms)
     files = document.getElementById('input-files').files
-    console.log('files', files)
+    const p = document.getElementById('error');
+
+    if (files.length === 0){
+        p.innerText =  "kein File ausgewählt"
+        return
+    } else {
+        p.innerText = ""
+    }
 
 
     //empty list
@@ -260,6 +267,7 @@ async function applySettings() {
     console.log("searchmap:", searchMap)
     
     
+    buildRangeSlider(searchMap)
 
 }
 
@@ -314,3 +322,39 @@ function downloadPdf(entry) {
 }
 
 
+function buildRangeSlider(map){
+    text = ""
+
+    for(let [key, value] of map){
+        text += `${key} <input type="range" min="1" max="10" value=${value} onInput="updateSlider()"  class="slider" id="${key}"> ${value} <br>`
+    }
+
+    const div =  document.getElementById('slider-container')
+    console.log("div", div)
+    div.innerHTML = text;
+
+}
+
+function updateSlider() {
+    buildHashMapFromRangeSliderValues();
+    buildRangeSlider(searchMap);
+}
+
+
+function buildHashMapFromRangeSliderValues(){
+
+    //reset map
+    searchMap = new Map()
+
+    //get input elements
+    const inputs = document.getElementsByClassName('slider');
+    //loop over
+    Array.from(inputs).forEach(entry => {
+        key = entry.id
+        value = entry.value
+        searchMap.set(key, value)
+    })
+    console.log("created map from slider: ", searchMap)
+
+
+}

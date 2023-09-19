@@ -10,14 +10,14 @@
     <script src="jszip.js"></script>
 
 </head>
-<body>
+<body onload="applySettings()">
     
     <input id="input-files" type="file" multiple>
     <input id="input-search" type="text">
     <button onclick="start()">click</button>
-    <button onclick="applySettings()">load</button>
+    <p id="error"></p>
 
-    <canvas id="the-canvas"></canvas>
+    <div id="slider-container"></div>
     
     <script src="script.js"></script>
 </body>
