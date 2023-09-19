@@ -7,7 +7,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 let files;
 let entries = [];
 
-
 let searchMap = new Map();
 
 class Entry {
@@ -23,6 +22,8 @@ class Entry {
 
 function start() {
 
+    //get values from ranges slider and build hasmap for searchterms
+    buildHashMapFromRangeSliderValues()
 
 
     files = document.getElementById('input-files').files
@@ -284,7 +285,7 @@ function buildRangeSlider(map){
     text = "<table>"
 
     for(let [key, value] of map){
-        text += `<tr><td>${key}</td><td><input type="range" min="1" max="50" value=${value} onInput="updateSlider()"  class="slider" id="${key}"> ${value}</td></tr>`
+        text += `<tr><td>${key}</td><td><input type="range" min="1" max="50" value=${value} onInput="updateSlider(event)"  class="slider" id="${key}"> <span id ="slider-span-${key}">${value}</span></td></tr>`
     }
 
     text += "</table>"
@@ -295,9 +296,9 @@ function buildRangeSlider(map){
 
 }
 
-function updateSlider() {
-    buildHashMapFromRangeSliderValues();
-    buildRangeSlider(searchMap);
+function updateSlider(event) {
+    let span = document.getElementById(`slider-span-${event.target.id}`)
+    span.innerText = event.target.value
 }
 
 
@@ -315,8 +316,7 @@ function buildHashMapFromRangeSliderValues(){
         searchMap.set(key, value)
     })
     console.log("created map from slider: ", searchMap)
-
-
+    return searchMap;
 }
 
 
