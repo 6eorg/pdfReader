@@ -10,14 +10,24 @@
     <script src="jszip.js"></script>
 
 </head>
-<body onload="applySettings()">
+<body onload="loadSettingsFile()">
+    <h1>Durchsuche PDFs</h1>
+    <p>Durchsucht PDFs nach Suchwörtern und ladet Seiten mit Treffer herunter</p>
+    <p>Der Download sortiert die PDF-Seiten nach Priorität (Gewichtung der Suchwörter)</p>
     
     <input id="input-files" type="file" multiple>
-    <input id="input-search" type="text">
-    <button onclick="start()">click</button>
+    Suchbegriffe (mit Komma trennen): <input id="input-search" type="text">
+    <br>
+    <p>Auswahl: welche Begriffe sollen verwendet werden</p>
+    <input  type="radio" value="input" name="radio-source" checked>Wörter aus Textfeld
+    <input  type="radio" value= "file" name="radio-source" checked>Settings-File (einstellbar in lokaler Anwendung)
+    <button onclick="initializeSlider()">anwenden</button>
+  
     <p id="error"></p>
+    <h2>Gewichtung der Suchworte</h2>
 
     <div id="slider-container"></div>
+    <button onclick="start()">Start Suche</button>
     
     <script src="script.js"></script>
 </body>

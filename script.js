@@ -4,7 +4,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
     './pdf.worker.js';
 
 
-let searchTerms;
 let files;
 let entries = [];
 
@@ -25,8 +24,7 @@ class Entry {
 function start() {
 
 
-    searchTerms = document.getElementById('input-search').value.split(',').map(term => term.trim())
-    console.log("search terms: ", searchTerms)
+
     files = document.getElementById('input-files').files
     const p = document.getElementById('error');
 
@@ -253,7 +251,7 @@ async function readSettings() {
     }
 }
 
-async function applySettings() {
+async function loadSettingsFile() {
     let text = await readSettings()
     text = text.toString()
     searchMap = new Map();
@@ -321,6 +319,31 @@ function downloadPdf(entry) {
 
 }
 
+
+
+//slider
+
+function initializeSlider(){
+
+    //check which radio button
+    radios = document.getElementsByName('radio-source');
+
+
+    if (radios[0].checked) {
+        //get inputs from searchfield
+        let searchTerms = document.getElementById('input-search').value.split(',').map(term => term.trim())
+        console.log("search terms: ", searchTerms)
+        //fill into map
+        searchMap = new Map()
+        searchTerms.forEach(word => {
+            searchMap.set(word, 5)
+        })
+        buildRangeSlider(searchMap)
+    } else{
+        loadSettingsFile()
+    }
+
+}
 
 function buildRangeSlider(map){
     text = ""
