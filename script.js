@@ -6,9 +6,8 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 
 let searchTerms;
 let files;
+let entries = [];
 
-
-let entries;
 
 let searchMap = new Map();
 
@@ -36,56 +35,56 @@ class Entry {
     files = document.getElementById('input-files').files
     console.log('files', files)
 
-    //new array to store entries
+
+    //empty list
     entries = new Array();
 
-    Array.from(files).forEach(async file => {
-        
-        let fileName = file.name.replace('.pdf', '');
-
-        await convertPdfToArrayBuffer(file).then(
-            async (resp) => {
-
-                let clonedArrayBuffer = cloneArrayBuffer(resp)
-                //extractPageAndDownload(resp, 0)
-
-                console.log(resp)
-                //shape into readable object
-                src = { data: resp };
-
-                //start function to extract text
-                extractText(src, fileName).then(
-                    async function (text) {
-                        console.log('parse ' + text);
-
-                        //download pages
-                        console.log("Ergebnisse Wortsuche :", entries)
+    let filePromises = Array.from(files).map(processFile);
+    Promise.all(filePromises)
+    .then(result => {
+        // All files have been processed at this point
+        console.log("All files processed", result);
+        const entriesList = result[result.length-1];
+        console.log("list with entries:", entriesList)
+        const totalWeight = entriesList.reduce((result, entry) => result + entry.weight, 0);
+        console.log("sum weight: ", totalWeight)
 
 
-                        for (let i = 0; i < entries.length; i++) {
-                            console.log("loopover and download")
-                            await extractPageAndDownload(clonedArrayBuffer, entries[i], fileName)
-                        }
-                
+        entriesList.forEach(entry => downloadPdf(entry));
 
-                    },
-                    function (reason) {
-                        console.error(reason);
-                    },
-               );
-
-          }
-
-        )
+    })
+    .catch(error => {
+        console.error("An error occurred:", error);
+    });
 
 
- })
+}
+
+
+async function processFile(file) {
+    console.log("file an der reihe: ", file.name)
+    //empty entries array
+    entries = new Array()
+    let fileName = file.name.replace('.pdf', '');
+
+    let resp = await convertPdfToArrayBuffer(file);
+    let clonedArrayBuffer = cloneArrayBuffer(resp);
+
+    // shape into readable object for pdf.js
+    let src = { data: resp };
+
+    //extract text and add entries with findings
+    let text = await extractText(src, fileName);
+
+    console.log('parse ' + text);
+    console.log("Ergebnisse Suche :", entries);
+
+    for (let i = 0; i < entries.length; i++) {
     
-    
-    
+        await extractPageAndAddToEntry(clonedArrayBuffer, entries[i], fileName);
+    }
 
-
-
+    return entries;
 }
 
 async function convertPdfToArrayBuffer(file) {
@@ -116,7 +115,6 @@ function extractText(pdfUrl, fileName) {
                 page.then(async function (page) {
 
 
-
                     var textContent = page.getTextContent();
                     return textContent.then(function (text) {
                         return text.items
@@ -144,6 +142,72 @@ function extractText(pdfUrl, fileName) {
 
 
 
+async function extractPageAndAddToEntry(pdfAsArrayBuffer, entry) {
+
+    const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
+    const newPdfDoc = await PDFLib.PDFDocument.create();
+    const copied = await newPdfDoc.copyPages(srcDoc, [entry.page])
+    let p = newPdfDoc.addPage(copied[0])
+    let {height, width} = p.getSize();
+    p.drawText(entry.terms.join(', '),  {
+        x: 2,
+        y: height - 12,
+        size: 10,
+      })
+  
+
+    const pdfBytes = await newPdfDoc.save()
+
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    entry.pdf = blob;
+    console.log("added pdf to entry", entry)
+}
+
+function cloneArrayBuffer(buffer) {
+    const clone = new Uint8Array(buffer.byteLength);
+    clone.set(new Uint8Array(buffer));
+    return clone.buffer;
+}
+
+
+function findSearchTermsInPage(text, pageNr, searchMap, fileName) {
+    let termsOnPage = []
+    let totalWeight = 0;
+
+    for (let [term, weight] of searchMap){
+        if (text.toLowerCase().includes(term.toLowerCase())){
+            console.log("eintrag gefunden", term),
+            //add to term array
+            termsOnPage.push(term);
+            //add to total
+            totalWeight += weight;
+        }
+    }
+
+    if (termsOnPage.length > 0) {
+        entries.push(new Entry(pageNr, termsOnPage, fileName, totalWeight));
+        console.log(" entries array: ", entries)
+    }
+}
+
+
+function downloadPdf(entry){
+    const url = window.URL.createObjectURL(entry.pdf);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = entry.fileName + '_' + entry.page + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    console.log('downlaoded')
+
+}
+
+
+
+///old 
 async function extractPageAndDownload(pdfAsArrayBuffer, entry, fileName) {
 
     const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
@@ -174,29 +238,3 @@ async function extractPageAndDownload(pdfAsArrayBuffer, entry, fileName) {
 
 }
 
-function cloneArrayBuffer(buffer) {
-    const clone = new Uint8Array(buffer.byteLength);
-    clone.set(new Uint8Array(buffer));
-    return clone.buffer;
-}
-
-
-function findSearchTermsInPage(text, pageNr, searchMap, fileName) {
-    let termsOnPage = []
-    let totalWeight = 0;
-
-    for (let [term, weight] of searchMap){
-        if (text.toLowerCase().includes(term.toLowerCase())){
-            console.log("eintrag gefunden", term),
-            //add to term array
-            termsOnPage.push(term);
-            //add to total
-            totalWeight += weight;
-        }
-    }
-
-    if (termsOnPage.length > 0) {
-        entries.push(new Entry(pageNr, termsOnPage, fileName, totalWeight));
-        console.log(" entries array: ", entries)
-    }
-}
