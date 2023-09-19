@@ -13,17 +13,20 @@
 <body onload="loadSettingsFile()">
     <h1>Durchsuche PDFs</h1>
     <p>Durchsucht PDFs nach Suchwörtern und ladet Seiten mit Treffer herunter</p>
-    <p>Der Download sortiert die PDF-Seiten nach Priorität (Gewichtung der Suchwörter)</p>
+    <p>Der Download sortiert die PDF-Seiten nach Priorität (Gewichtung der Suchwörter). Es wird dabei zwischen Prioriät A und B unterschieden. A = Seiten mit gewichteten Suchtreffern über den Gesamtdurchschnitt der Seiten</p>
     
     <input id="input-files" type="file" multiple>
+    <p style="color: red;" id="error"></p>
+
+    <br>
+    <br>
     Suchbegriffe (mit Komma trennen): <input id="input-search" type="text">
     <br>
     <p>Auswahl: welche Begriffe sollen verwendet werden</p>
-    <input  type="radio" value="input" name="radio-source" checked>Wörter aus Textfeld
+    <input  type="radio" value="input" name="radio-source">Wörter aus Textfeld
     <input  type="radio" value= "file" name="radio-source" checked>Settings-File (einstellbar in lokaler Anwendung)
     <button onclick="initializeSlider()">anwenden</button>
   
-    <p id="error"></p>
     <h2>Gewichtung der Suchworte</h2>
 
     <div id="slider-container"></div>

@@ -272,55 +272,6 @@ async function loadSettingsFile() {
 
 
 
-
-
-///old / not needed
-async function extractPageAndDownload(pdfAsArrayBuffer, entry, fileName) {
-
-    const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
-    const newPdfDoc = await PDFLib.PDFDocument.create();
-    const copied = await newPdfDoc.copyPages(srcDoc, [entry.page])
-    let p = newPdfDoc.addPage(copied[0])
-    let { height, width } = p.getSize();
-    p.drawText(entry.terms.join(', '), {
-        x: 20,
-        y: height - 20,
-        size: 10,
-    })
-
-
-    const pdfBytes = await newPdfDoc.save()
-
-    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = fileName + '_page_' + entry.page + '.pdf';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-    console.log('downlaoded')
-
-}
-
-function downloadPdf(entry) {
-    const url = window.URL.createObjectURL(entry.pdf);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = entry.fileName + '_' + entry.page + '.pdf';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-    console.log('downlaoded')
-
-}
-
-
-
 //slider
 
 function initializeSlider(){
@@ -379,5 +330,54 @@ function buildHashMapFromRangeSliderValues(){
     })
     console.log("created map from slider: ", searchMap)
 
+
+}
+
+
+
+
+
+///old / not needed
+async function extractPageAndDownload(pdfAsArrayBuffer, entry, fileName) {
+
+    const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
+    const newPdfDoc = await PDFLib.PDFDocument.create();
+    const copied = await newPdfDoc.copyPages(srcDoc, [entry.page])
+    let p = newPdfDoc.addPage(copied[0])
+    let { height, width } = p.getSize();
+    p.drawText(entry.terms.join(', '), {
+        x: 20,
+        y: height - 20,
+        size: 10,
+    })
+
+
+    const pdfBytes = await newPdfDoc.save()
+
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = fileName + '_page_' + entry.page + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    console.log('downlaoded')
+
+}
+
+function downloadPdf(entry) {
+    const url = window.URL.createObjectURL(entry.pdf);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = entry.fileName + '_' + entry.page + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    console.log('downlaoded')
 
 }
