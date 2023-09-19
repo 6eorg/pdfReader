@@ -392,10 +392,10 @@ function showFoundEntries(entries) {
 
     entries.sort((a, b) => {return a.weight < b.weight})
 
-    text = "<h1>Suchresultate:</h1><br><table><tr><th>PDF:</th><th>Seite:</th><th>gefundene Wörter</th><th>Gewichtung</th></tr>"
+    text = "<h1>Suchresultate:</h1><br><table><tr><th>PDF:</th><th>Seite:</th><th>gefundene Wörter</th><th>Gewichtung</th><th>Direktlink</th></tr>"
 
     entries.forEach(entry => {
-        text += `<tr><td style="padding-right:20px;">${entry.fileName}</td><td style="padding-right:20px;">${entry.page}</td><td>${entry.terms.join(", ")}</td><td>${entry.weight}</td></tr>`
+        text += `<tr><td style="padding-right:20px;">${entry.fileName}</td><td style="padding-right:20px;">${entry.page}</td><td>${entry.terms.join(", ")}</td><td>${entry.weight}</td><td><a href=${window.URL.createObjectURL(entry.pdf)} target="_blank">Show</a></tr>`
     })
 
     text += "</table>"
