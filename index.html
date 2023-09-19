@@ -26,11 +26,15 @@
     <input  type="radio" value="input" name="radio-source">Wörter aus Textfeld
     <input  type="radio" value= "file" name="radio-source" checked>Settings-File (einstellbar in lokaler Anwendung)
     <button onclick="initializeSlider()">anwenden</button>
+
+    <button onclick="start()">Start Suche</button>
   
     <h2>Gewichtung der Suchworte</h2>
 
     <div id="slider-container"></div>
-    <button onclick="start()">Start Suche</button>
+
+    <div id="result-container"></div>
+
     
     <script src="script.js"></script>
 </body>

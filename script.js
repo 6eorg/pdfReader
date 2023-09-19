@@ -52,6 +52,9 @@ function start() {
             console.log("sum weight: ", totalWeight)
 
             buildZip(entriesList, totalWeight)
+
+            //show entries in page
+            showFoundEntries(entriesList)
         })
         .catch(error => {
             console.error("An error occurred:", error);
@@ -121,7 +124,7 @@ function extractText(pdfUrl, fileName) {
                             })
                             .join('');
                     }).then(text => {
-
+                        console.log("text on page: ", pageNr, "text: ", text)
                         findSearchTermsInPage(text, pageNr, searchMap, fileName);
                         pageNr++;
                         return text;
@@ -297,11 +300,13 @@ function initializeSlider(){
 }
 
 function buildRangeSlider(map){
-    text = ""
+    text = "<table>"
 
     for(let [key, value] of map){
-        text += `${key} <input type="range" min="1" max="10" value=${value} onInput="updateSlider()"  class="slider" id="${key}"> ${value} <br>`
+        text += `<tr><td>${key}</td><td><input type="range" min="1" max="50" value=${value} onInput="updateSlider()"  class="slider" id="${key}"> ${value}</td></tr>`
     }
+
+    text += "</table>"
 
     const div =  document.getElementById('slider-container')
     console.log("div", div)
@@ -380,4 +385,21 @@ function downloadPdf(entry) {
 
     console.log('downlaoded')
 
+}
+
+
+function showFoundEntries(entries) {
+
+    entries.sort((a, b) => {return a.weight < b.weight})
+
+    text = "<table><tr><th>PDF:</th><th>Seite:</th><th>gefundene Wörter</th><th>Gewichtung</th></tr>"
+
+    entries.forEach(entry => {
+        text += `<tr><td style="padding-right:20px;">${entry.fileName}</td><td style="padding-right:20px;">${entry.page}</td><td>${entry.terms.join(", ")}</td><td>${entry.weight}</td></tr>`
+    })
+
+    text += "</table>"
+
+    let div = document.getElementById("result-container");
+    div.innerHTML = text;
 }
