@@ -12,9 +12,9 @@
 </head>
 <body onload="loadSettingsFile()">
     <h1>Durchsuche PDFs</h1>
-    <p>Durchsucht PDFs nach Suchwörtern und ladet Seiten mit Treffer herunter</p>
+    <p>Durchsucht PDFs nach Suchwörtern und ladet die Seiten mit Treffern herunter.</p>
     <p>Der Download sortiert die PDF-Seiten nach Priorität (Gewichtung der Suchwörter). Es wird dabei zwischen Prioriät A und B unterschieden. A = Seiten mit gewichteten Suchtreffern über den Gesamtdurchschnitt der Seiten</p>
-    
+    <p>In der Konsole wird der Suchprozess gelogt (zum Ansehen: F12 > Konsole)</p>
     <input id="input-files" type="file" multiple>
     <p style="color: red;" id="error"></p>
 
@@ -28,7 +28,7 @@
     <button onclick="initializeSlider()">anwenden</button>
 
     <button onclick="start()">Start Suche</button>
-
+    <p>Status: <span style="color: green;" id="status">Suche noch nicht gestartet</span></p>
     
     <div id="result-container"></div>
 

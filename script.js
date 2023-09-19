@@ -56,6 +56,8 @@ function start() {
 
             //show entries in page
             showFoundEntries(entriesList)
+
+            updateStatus("Suche abgeschlossen")
         })
         .catch(error => {
             console.error("An error occurred:", error);
@@ -171,6 +173,7 @@ async function extractPageAndAddToEntry(pdfAsArrayBuffer, entry) {
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     entry.pdf = blob;
     console.log("added pdf to entry", entry)
+    updateStatus("Pdf wird generiert: " + entry.fileName + " Seite: " +  entry.page)
 }
 
 function cloneArrayBuffer(buffer) {
@@ -200,6 +203,8 @@ function findSearchTermsInPage(text, pageNr, searchMap, fileName) {
         console.log(" entries array: ", entries)
     }
     console.log("local entries on page: ", pageNr, localEntries)
+
+    updateStatus("Durchsuche " + fileName + "S. " + pageNr)
     return localEntries
 }
 
@@ -386,4 +391,9 @@ function showFoundEntries(entries) {
 
     let div = document.getElementById("result-container");
     div.innerHTML = text;
+}
+
+function updateStatus(message){
+    p = document.getElementById('status')
+    p.innerText = message
 }
