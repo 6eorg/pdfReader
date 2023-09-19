@@ -18,16 +18,11 @@ class Entry {
         this.weight = weight;
         this.fileName = fileName;
         this.pdf;
-
     }
 }
 
 
 function start() {
-
-    //test entries
-    searchMap.set("Georg", 10);
-    searchMap.set("Anlage", 1)
 
 
     searchTerms = document.getElementById('input-search').value.split(',').map(term => term.trim())
@@ -44,6 +39,7 @@ function start() {
         .then(result => {
             // All files have been processed at this point
             console.log("All files processed", result);
+            //problem with async: collect all and the make set
             let entriesList = Array.from(new Set(result.flat()));
 
             console.log("list with entries:", entriesList)
@@ -51,15 +47,10 @@ function start() {
             console.log("sum weight: ", totalWeight)
 
             buildZip(entriesList, totalWeight)
-
-            //entriesList.forEach(entry => downloadPdf(entry));
-
         })
         .catch(error => {
             console.error("An error occurred:", error);
         });
-
-
 }
 
 
@@ -81,7 +72,6 @@ async function processFile(file) {
     console.log("entries found in pdf :", entriesForPdf);
 
     for (let i = 0; i < entriesForPdf.length; i++) {
-
         await extractPageAndAddToEntry(clonedArrayBuffer, entriesForPdf[i], fileName);
     }
 
@@ -176,7 +166,6 @@ function buildZip(entries, totalWeight) {
 
 
 
-
 async function extractPageAndAddToEntry(pdfAsArrayBuffer, entry) {
 
     const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
@@ -189,7 +178,6 @@ async function extractPageAndAddToEntry(pdfAsArrayBuffer, entry) {
         y: height - 12,
         size: 10,
     })
-
 
     const pdfBytes = await newPdfDoc.save()
 
@@ -237,27 +225,50 @@ function downloadZip(zip) {
     window.URL.revokeObjectURL(url);
 
     console.log('downlaoded')
+}
+
+async function readSettings() {
+    try {
+        // Use the Fetch API to get the file
+        const response = await fetch('settings.txt');
+
+        // Check if the response is ok
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // Read the text from the file
+        const allText = await response.text();
+        console.log("Read text from file:", allText);
+        return allText.toString();
+    } catch (error) {
+        console.error("Failed to read the file:", error);
+    }
+}
+
+async function applySettings() {
+    let text = await readSettings()
+    text = text.toString()
+    searchMap = new Map();
+    let params =  text.split('\n').map(entry => entry.trim())
+    console.log(params)
+    //loop over params¨
+    params.forEach(entry =>{
+        let [term, weight] = entry.split(',');
+        searchMap.set(term, Number(weight))
+    })
+    console.log("searchmap:", searchMap)
+    
+    
 
 }
 
 
-function downloadPdf(entry) {
-    const url = window.URL.createObjectURL(entry.pdf);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = entry.fileName + '_' + entry.page + '.pdf';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-    console.log('downlaoded')
-
-}
 
 
 
-///old 
+
+///old / not needed
 async function extractPageAndDownload(pdfAsArrayBuffer, entry, fileName) {
 
     const srcDoc = await PDFLib.PDFDocument.load(pdfAsArrayBuffer);
@@ -287,4 +298,19 @@ async function extractPageAndDownload(pdfAsArrayBuffer, entry, fileName) {
     console.log('downlaoded')
 
 }
+
+function downloadPdf(entry) {
+    const url = window.URL.createObjectURL(entry.pdf);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = entry.fileName + '_' + entry.page + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    console.log('downlaoded')
+
+}
+
 
