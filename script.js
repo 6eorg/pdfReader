@@ -13,17 +13,17 @@ let searchMap = new Map();
 
 class Entry {
     constructor(page, terms, fileName, weight) {
-      this.page = page;
-      this.terms = terms;
-      this.weight = weight;
-      this.fileName = fileName;
-      this.pdf;
+        this.page = page;
+        this.terms = terms;
+        this.weight = weight;
+        this.fileName = fileName;
+        this.pdf;
 
     }
-  }
+}
 
 
- function start() {
+function start() {
 
     //test entries
     searchMap.set("Georg", 10);
@@ -41,21 +41,22 @@ class Entry {
 
     let filePromises = Array.from(files).map(processFile);
     Promise.all(filePromises)
-    .then(result => {
-        // All files have been processed at this point
-        console.log("All files processed", result);
-        const entriesList = result[result.length-1];
-        console.log("list with entries:", entriesList)
-        const totalWeight = entriesList.reduce((result, entry) => result + entry.weight, 0);
-        console.log("sum weight: ", totalWeight)
+        .then(result => {
+            // All files have been processed at this point
+            console.log("All files processed", result);
+            const entriesList = result[result.length - 1];
+            console.log("list with entries:", entriesList)
+            const totalWeight = entriesList.reduce((result, entry) => result + entry.weight, 0);
+            console.log("sum weight: ", totalWeight)
 
+            buildZip(entriesList, totalWeight)
 
-        entriesList.forEach(entry => downloadPdf(entry));
+            //entriesList.forEach(entry => downloadPdf(entry));
 
-    })
-    .catch(error => {
-        console.error("An error occurred:", error);
-    });
+        })
+        .catch(error => {
+            console.error("An error occurred:", error);
+        });
 
 
 }
@@ -63,8 +64,7 @@ class Entry {
 
 async function processFile(file) {
     console.log("file an der reihe: ", file.name)
-    //empty entries array
-    entries = new Array()
+
     let fileName = file.name.replace('.pdf', '');
 
     let resp = await convertPdfToArrayBuffer(file);
@@ -74,17 +74,17 @@ async function processFile(file) {
     let src = { data: resp };
 
     //extract text and add entries with findings
-    let text = await extractText(src, fileName);
+    let entriesForPdf = await extractText(src, fileName);
 
-    console.log('parse ' + text);
-    console.log("Ergebnisse Suche :", entries);
 
-    for (let i = 0; i < entries.length; i++) {
-    
-        await extractPageAndAddToEntry(clonedArrayBuffer, entries[i], fileName);
+    console.log("entries found in pdf :", entriesForPdf);
+
+    for (let i = 0; i < entriesForPdf.length; i++) {
+
+        await extractPageAndAddToEntry(clonedArrayBuffer, entriesForPdf[i], fileName);
     }
 
-    return entries;
+    return entriesForPdf;
 }
 
 async function convertPdfToArrayBuffer(file) {
@@ -103,6 +103,8 @@ function extractText(pdfUrl, fileName) {
     let pageNr = 0;
     var pdf = pdfjsLib.getDocument(pdfUrl);
     return pdf.promise.then(function (pdf) {
+        //empty array for each pdf
+        entries = new Array()
         var totalPageCount = pdf.numPages;
         var countPromises = [];
         for (
@@ -133,10 +135,42 @@ function extractText(pdfUrl, fileName) {
             );
         }
 
-        return Promise.all(countPromises).then(function (texts) {
-            return texts.join('');
+        return Promise.all(countPromises).then(function () {
+            return entries;
         });
     });
+}
+
+function buildZip(entries, totalWeight) {
+    const priorityA = []
+    const priorityB = []
+    averageWeight = totalWeight / entries.length
+    entries.forEach(entry => {
+        if (entry.weight > averageWeight) {
+            priorityA.push(entry)
+        } else {
+            priorityB.push(entry)
+        }
+    })
+    console.log("priorityA: ", priorityA)
+    console.log("priorityB: ", priorityB)
+
+    var zip = new JSZip();
+    folderA = zip.folder('A')
+    folderB = zip.folder('B')
+    priorityA.forEach(entry => {
+        let fileName = entry.fileName + '_' + entry.page + '.pdf'
+        folderA.file(fileName, entry.pdf, { base64: true })
+    })
+    priorityB.forEach(entry => {
+        let fileName = entry.fileName + '_' + entry.page + '.pdf'
+        folderB.file(fileName, entry.pdf, { base64: true })
+    })
+    zip.generateAsync({ type: "blob" })
+        .then(function (content) {
+
+            downloadZip(content)
+        });
 }
 
 
@@ -148,13 +182,13 @@ async function extractPageAndAddToEntry(pdfAsArrayBuffer, entry) {
     const newPdfDoc = await PDFLib.PDFDocument.create();
     const copied = await newPdfDoc.copyPages(srcDoc, [entry.page])
     let p = newPdfDoc.addPage(copied[0])
-    let {height, width} = p.getSize();
-    p.drawText(entry.terms.join(', '),  {
+    let { height, width } = p.getSize();
+    p.drawText(entry.terms.join(', '), {
         x: 2,
         y: height - 12,
         size: 10,
-      })
-  
+    })
+
 
     const pdfBytes = await newPdfDoc.save()
 
@@ -174,11 +208,11 @@ function findSearchTermsInPage(text, pageNr, searchMap, fileName) {
     let termsOnPage = []
     let totalWeight = 0;
 
-    for (let [term, weight] of searchMap){
-        if (text.toLowerCase().includes(term.toLowerCase())){
+    for (let [term, weight] of searchMap) {
+        if (text.toLowerCase().includes(term.toLowerCase())) {
             console.log("eintrag gefunden", term),
-            //add to term array
-            termsOnPage.push(term);
+                //add to term array
+                termsOnPage.push(term);
             //add to total
             totalWeight += weight;
         }
@@ -191,7 +225,22 @@ function findSearchTermsInPage(text, pageNr, searchMap, fileName) {
 }
 
 
-function downloadPdf(entry){
+function downloadZip(zip) {
+    const url = window.URL.createObjectURL(zip);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'gefunden.zip';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    console.log('downlaoded')
+
+}
+
+
+function downloadPdf(entry) {
     const url = window.URL.createObjectURL(entry.pdf);
     const a = document.createElement('a');
     a.style.display = 'none';
@@ -214,13 +263,13 @@ async function extractPageAndDownload(pdfAsArrayBuffer, entry, fileName) {
     const newPdfDoc = await PDFLib.PDFDocument.create();
     const copied = await newPdfDoc.copyPages(srcDoc, [entry.page])
     let p = newPdfDoc.addPage(copied[0])
-    let {height, width} = p.getSize();
-    p.drawText(entry.terms.join(', '),  {
+    let { height, width } = p.getSize();
+    p.drawText(entry.terms.join(', '), {
         x: 20,
         y: height - 20,
         size: 10,
-      })
-  
+    })
+
 
     const pdfBytes = await newPdfDoc.save()
 
