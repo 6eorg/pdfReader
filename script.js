@@ -7,25 +7,41 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 let searchTerms;
 let files;
 
-let pagesContaininingSearchTerms;
+
+let entries;
+
+let searchMap = new Map();
+
 class Entry {
-    constructor(page, terms) {
+    constructor(page, terms, fileName, weight) {
       this.page = page;
       this.terms = terms;
+      this.weight = weight;
+      this.fileName = fileName;
+      this.pdf;
+
     }
   }
 
 
-function start() {
+ function start() {
+
+    //test entries
+    searchMap.set("Georg", 10);
+    searchMap.set("Anlage", 1)
+
+
     searchTerms = document.getElementById('input-search').value.split(',').map(term => term.trim())
     console.log("search terms: ", searchTerms)
     files = document.getElementById('input-files').files
     console.log('files', files)
 
+    //new array to store entries
+    entries = new Array();
 
     Array.from(files).forEach(async file => {
-        pagesContaininingSearchTerms = new Array();
-        const fileName = file.name.replace('.pdf', '');
+        
+        let fileName = file.name.replace('.pdf', '');
 
         await convertPdfToArrayBuffer(file).then(
             async (resp) => {
@@ -38,31 +54,35 @@ function start() {
                 src = { data: resp };
 
                 //start function to extract text
-                extractText(src).then(
+                extractText(src, fileName).then(
                     async function (text) {
                         console.log('parse ' + text);
 
                         //download pages
-                        console.log("Ergebnisse Wortsuche :", pagesContaininingSearchTerms)
+                        console.log("Ergebnisse Wortsuche :", entries)
 
 
-                        for (let i = 0; i < pagesContaininingSearchTerms.length; i++) {
+                        for (let i = 0; i < entries.length; i++) {
                             console.log("loopover and download")
-                            await extractPageAndDownload(clonedArrayBuffer, pagesContaininingSearchTerms[i], fileName)
+                            await extractPageAndDownload(clonedArrayBuffer, entries[i], fileName)
                         }
+                
 
                     },
                     function (reason) {
                         console.error(reason);
                     },
-                );
+               );
 
-            }
+          }
 
         )
 
 
-    })
+ })
+    
+    
+    
 
 
 
@@ -80,7 +100,7 @@ async function convertPdfToArrayBuffer(file) {
     });
 }
 
-function extractText(pdfUrl) {
+function extractText(pdfUrl, fileName) {
     let pageNr = 0;
     var pdf = pdfjsLib.getDocument(pdfUrl);
     return pdf.promise.then(function (pdf) {
@@ -106,7 +126,7 @@ function extractText(pdfUrl) {
                             .join('');
                     }).then(text => {
 
-                        findSearchTermsInPage(text, pageNr, searchTerms);
+                        findSearchTermsInPage(text, pageNr, searchMap, fileName);
                         pageNr++;
                         return text;
                     }
@@ -161,15 +181,22 @@ function cloneArrayBuffer(buffer) {
 }
 
 
-function findSearchTermsInPage(text, pageNr, searchTerms) {
+function findSearchTermsInPage(text, pageNr, searchMap, fileName) {
     let termsOnPage = []
-    searchTerms.forEach(term => {
-        if (text.toLowerCase().includes(term.toLowerCase())) {
-            termsOnPage.push(term)
+    let totalWeight = 0;
+
+    for (let [term, weight] of searchMap){
+        if (text.toLowerCase().includes(term.toLowerCase())){
+            console.log("eintrag gefunden", term),
+            //add to term array
+            termsOnPage.push(term);
+            //add to total
+            totalWeight += weight;
         }
-    })
+    }
 
     if (termsOnPage.length > 0) {
-        pagesContaininingSearchTerms.push(new Entry(pageNr, termsOnPage));
+        entries.push(new Entry(pageNr, termsOnPage, fileName, totalWeight));
+        console.log(" entries array: ", entries)
     }
 }
