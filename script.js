@@ -330,7 +330,7 @@ function buildHashMapFromRangeSliderValues(){
     //loop over
     Array.from(inputs).forEach(entry => {
         key = entry.id
-        value = entry.value
+        value = Number(entry.value)
         searchMap.set(key, value)
     })
     console.log("created map from slider: ", searchMap)
@@ -392,7 +392,7 @@ function showFoundEntries(entries) {
 
     entries.sort((a, b) => {return a.weight < b.weight})
 
-    text = "<table><tr><th>PDF:</th><th>Seite:</th><th>gefundene Wörter</th><th>Gewichtung</th></tr>"
+    text = "<h1>Suchresultate:</h1><br><table><tr><th>PDF:</th><th>Seite:</th><th>gefundene Wörter</th><th>Gewichtung</th></tr>"
 
     entries.forEach(entry => {
         text += `<tr><td style="padding-right:20px;">${entry.fileName}</td><td style="padding-right:20px;">${entry.page}</td><td>${entry.terms.join(", ")}</td><td>${entry.weight}</td></tr>`
