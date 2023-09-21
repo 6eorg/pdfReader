@@ -287,7 +287,7 @@ function initializeSlider() {
 }
 
 function buildRangeSlider(map) {
-    text = "<table>"
+    text = "<table  class=”sortable”>"
 
     for (let [key, value] of map) {
         text += `<tr><td>${key}</td><td><input type="range" min="0" max="50" value=${value} onInput="updateSlider(event)"  class="slider" id="${key}"> <span id ="slider-span-${key}">${value}</span></td></tr>`
@@ -381,13 +381,13 @@ function showFoundEntries(entries) {
 
     entries.sort((a, b) => { return a.weight < b.weight })
 
-    text = "<h1>Suchresultate:</h1><br><table><tr><th>PDF</th><th>Seite</th><th>Gefundene Wörter</th><th>Gewichtung</th><th>Direktlink</th></tr>"
+    text = "<h1>Suchresultate:</h1><br><table class='sortable'><thead><tr><th>PDF</th><th>Seite</th><th>Gefundene Wörter</th><th>Gewichtung</th><th>Direktlink</th></tr></thead><tbody>"
 
     entries.forEach(entry => {
         text += `<tr><td style="padding-right:20px;">${entry.fileName}</td><td style="padding-right:20px;">${entry.page}</td><td>${entry.terms.join(", ")}</td><td>${entry.weight}</td><td><a href=${window.URL.createObjectURL(entry.pdf)} target="_blank">Show</a></tr>`
     })
 
-    text += "</table>"
+    text += "</tbody></table>"
 
     let div = document.getElementById("result-container");
     div.innerHTML = text;
@@ -397,3 +397,4 @@ function updateStatus(message){
     p = document.getElementById('status')
     p.innerText = message
 }
+
