@@ -287,7 +287,7 @@ function initializeSlider() {
 }
 
 function buildRangeSlider(map) {
-    text = "<table  class=”sortable”>"
+    text = "<table>"
 
     for (let [key, value] of map) {
         text += `<tr><td>${key}</td><td><input type="range" min="0" max="50" value=${value} onInput="updateSlider(event)"  class="slider" id="${key}"> <span id ="slider-span-${key}">${value}</span></td></tr>`
