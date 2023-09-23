@@ -1,61 +1,61 @@
-Schule,4
-Primarschule,4
-Oberstufe,4
+Arbeitsbelastung,9
+Ausbildungsfinanzierung,9
+Auslandaufenthalt,4
+Berufliche Grundbildung,5
+Berufsbildung,10
+Berufsfeld, 30
+Berufsinformation,10
+Berufslehre,7
+Berufsprüfung,5
+Berufsschule,10
+Berufsvorbereitung,10
 Berufswahl,8
 Berufswahlunterricht,10
-Berufsvorbereitung,10
-Lehre,4
-EFZ,5
-eidgenössisches Fähigkeitszeugnis,4
-EBA,5
-Eidgenössisches Berufsattest,5
-Berufslehre,7
-Berufliche Grundbildung,5
-Laufbahn,4
-Weiterbildung,5
-Erwerbslosigkeit,5
-Erwerbslosenquote,5
-Selbständigkeit,5
-selbständig,3
-Berufsprüfung,5
-Höhere Berufsbildung,8
-Berufsbildung,10
-Studium,3
-Studiengang,6
-Studenten,2
-Studentin,2
-Studiengänge,7
-Universität Bern,5
-Universität Zürich,5
-PH Bern,8
-Pädagogische Hochschule Bern,8
-Stellensuche,10
 Bewerbung,8
-Lehrstelle,5
-Schnupperlehre,4
-Lebenslauf,4
 Bewerbungsgespräch,4
-Vorstellungsgespräch,4
-Burnout,8
-Arbeitsbelastung,9
-Auslandaufenthalt,4
-Lohn,4
-Lohnerhöhung,4
-Stipendium,4
-Stipendien,5
-Ausbildungsfinanzierung,9
-Fachhochschule,4
-Höhere Fachschule,4
-Fachmittelschule,4
-Handelsmittelschule,4
-Gymnasium,4
 BIZ Bern,50
-BIZ,50
-Berufsinformation,10
-Daniel Reumiller,10
-BIZ Interlaken,50
-BIZ Thun,50
-BIZ Langenthal,50
-BIZ Langnau,50
 BIZ Biel,50
 BIZ Burgdorf,50
+BIZ Interlaken,50
+BIZ Langenthal,50
+BIZ Langnau,50
+BIZ Thun,50
+Burnout,8
+Daniel Reumiller,10
+EFZ,5
+Eidgenössisches Berufsattest,5
+eidgenössisches Fähigkeitszeugnis,4
+Erwerbslosenquote,5
+Erwerbslosigkeit,5
+Fachhochschule,4
+Fachmittelschule,4
+Fachschule, 10
+Grundbildung, 50
+Gymnasium,4
+Handelsmittelschule,4
+Höhere Berufsbildung,8
+Höhere Fachschule,4
+Laufbahn,4
+Lebenslauf,4
+Lehrstelle,5
+Lohn,4
+Lohnerhöhung,4
+Oberstufe,4
+Pädagogische Hochschule Bern,8
+PH Bern,8
+Primarschule,4
+Schnupperlehre,4
+selbständig,3
+Selbständigkeit,5
+Stellensuche,10
+Stipendien,5
+Stipendium,4
+Studenten,2
+Studentin,2
+Studiengang,6
+Studiengänge,7
+Studium,3
+Universität Bern,5
+Universität Zürich,5
+Vorstellungsgespräch,4
+Weiterbildung,5
