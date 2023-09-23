@@ -398,3 +398,10 @@ function updateStatus(message){
     p.innerText = message
 }
 
+function showTextfield() {
+    console.log("in method showtexfield")
+    const div = document.getElementById("text-intput-container")
+    console.log("display: ", div.style.display)
+    div.style.display = div.style.display === 'none' ? 'block' : 'none'
+}
+
