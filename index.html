@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
@@ -11,44 +12,57 @@
     <link rel="stylesheet" href="style.css">
 
 </head>
+
 <body onload="loadSettingsFile()">
     <h1>Durchsuche PDFs</h1>
     <p>Durchsucht PDFs nach Suchwörtern und ladet die Seiten mit Treffern herunter.</p>
-    <p>Der Download sortiert die PDF-Seiten nach Priorität (Gewichtung der Suchwörter). Es wird dabei zwischen Prioriät A und B unterschieden. A = Seiten mit gewichteten Suchtreffern über den Gesamtdurchschnitt der Seiten</p>
-    <p>In der Konsole wird der Suchprozess gelogt (zum Ansehen: F12 > Konsole). Download des Programms: (<a href="pdfReader.zip">zip</a>)</p>
+    <p>In der Konsole wird der Suchprozess gelogt (zum Ansehen: F12 > Konsole). Download des Programms: (<a
+            href="pdfReader.z<ip">zip</a>)</p>
+    <h2>Links E-Paper</h2>
+    <span>Datum: </span>
+    <input style="margin-bottom: 10px;" type="date" onchange="displayNewspaperLinks(event)">
 
+    <div id="newspaper-container"></div>
+
+    <h2>Datei-Upload</h2>
     <input id="input-files" type="file" multiple>
     <p style="color: red;" id="error"></p>
 
     <br>
-    <br>
-    <input id="checkbox-input" onchange="showTextfield()" type="checkbox">andere Suchbegriffe definieren
-    <div id="text-intput-container" style="display: none;">
-    Suchbegriffe (mit Komma trennen): <input id="input-search" type="text">
-    <br>
 
-    <input  type="radio" value="input" name="radio-source" checked>Wörter aus Textfeld
-    <input  type="radio" value= "file" name="radio-source">Settings-File
-    <button onclick="initializeSlider()">anwenden</button>
-    </div>
-    <br>
 
     <button onclick="start()">Start Suche</button>
     <p>Status: <span style="color: green;" id="status">Suche noch nicht gestartet</span></p>
-    
+
     <div id="result-container"></div>
 
-  
+
     <h2>Gewichtung der Suchworte</h2>
     <p>0 = von der Suche ausgenommen</p>
 
     <div id="slider-container"></div>
 
-    
+
+
+
+   <!--other method to add text input remove style in first div to use-->
+    <div style="display: none;">
+    <input id="checkbox-input" onchange="showTextfield()" type="checkbox">andere Suchbegriffe definieren
+</div>
+
+    <div id="text-intput-container" style="display: none;">
+        Suchbegriffe (mit Komma trennen): <input id="input-search" type="text">
+        <br>
+
+        <input type="radio" value="input" name="radio-source" checked>Wörter aus Textfeld
+        <input type="radio" value="file" name="radio-source">Settings-File
+        <button onclick="initializeSlider()">anwenden</button>
+    </div>
+
+
     <script src="script.js"></script>
     <script src="sort-table.js"></script>
 
-    
-    
 </body>
+
 </html>

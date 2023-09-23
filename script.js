@@ -405,3 +405,19 @@ function showTextfield() {
     div.style.display = div.style.display === 'none' ? 'block' : 'none'
 }
 
+function displayNewspaperLinks(event){
+    console.log("event: ", event.target.value)
+    const date = event.target.value
+    const [year, month, day] = date.split("-")
+    console.log(year, month, day)
+    const datePart = date;
+    const linkBund = `<a href="https://epaper.derbund.ch/read/46/46/${datePart}/1" target="_blank">https://epaper.derbund.ch/read/46/46/${datePart}/1</a>`
+    const linkBZ = `<a href="https://epaper.bernerzeitung.ch/read/20000/20000/${datePart}/1" target="_blank">https://epaper.bernerzeitung.ch/read/20000/20000/${datePart}/1</a>`
+    const linkTA = `<a href="https://epaper.tagesanzeiger.ch/read/20/20/${datePart}/1" target="_blank">https://epaper.tagesanzeiger.ch/read/20/20/${datePart}/1</a>`
+
+
+    div = document.getElementById("newspaper-container")
+    div.innerHTML = linkBund + "<br>" + linkBZ + "<br>" + linkTA + "<br><br>"
+    
+
+}
