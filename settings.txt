@@ -1,6 +1,11 @@
 Arbeitsbelastung,9
+Arbeitslosigkeit,5
+Arbeitslosenversicherung,5
+Arbeitsvermittlung,5
 Ausbildungsfinanzierung,9
 Auslandaufenthalt,4
+Auszubildende,5
+Beruf,2
 Berufliche Grundbildung,5
 Berufsbildung,10
 Berufsfeld, 30
@@ -25,10 +30,13 @@ Daniel Reumiller,10
 EFZ,5
 Eidgenössisches Berufsattest,5
 eidgenössisches Fähigkeitszeugnis,4
+Erwerbsersatzordnung,5
 Erwerbslosenquote,5
 Erwerbslosigkeit,5
 Fachhochschule,4
+Fachkräftemangel,7
 Fachmittelschule,4
+Fachrichtung,5
 Fachschule, 10
 Grundbildung, 50
 Gymnasium,4
@@ -37,16 +45,20 @@ Höhere Berufsbildung,8
 Höhere Fachschule,4
 Laufbahn,4
 Lebenslauf,4
+Lehrabschluss,5
+Lehrjahr,5
 Lehrstelle,5
-Lohn,4
 Lohnerhöhung,4
+Nachwuchsprobleme,5
 Oberstufe,4
 Pädagogische Hochschule Bern,8
+Personalmangel,5
 PH Bern,8
 Primarschule,4
 Schnupperlehre,4
 selbständig,3
 Selbständigkeit,5
+Spitex,5
 Stellensuche,10
 Stipendien,5
 Stipendium,4
@@ -55,7 +67,11 @@ Studentin,2
 Studiengang,6
 Studiengänge,7
 Studium,3
+Taggeld,5
 Universität Bern,5
 Universität Zürich,5
 Vorstellungsgespräch,4
 Weiterbildung,5
+(ALV),5
+(EO),5
+(RAV),5
