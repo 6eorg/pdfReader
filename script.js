@@ -259,6 +259,15 @@ async function loadSettingsFile() {
 
 }
 
+function openAllLinksInNewTabs() {
+    const htmlElements = document.getElementsByClassName("archor-link");
+    console.log("all a tags: ", htmlElements);
+    for (let i = htmlElements.length-1; i>= 0; i--){
+        htmlElements[i].click()
+    }
+
+}
+
 
 
 
@@ -384,7 +393,7 @@ function showFoundEntries(entries) {
     text = "<h1>Suchresultate:</h1><br><table class='sortable'><thead><tr><th>PDF</th><th>Seite</th><th>Gefundene Wörter</th><th>Gewichtung</th><th>Direktlink</th></tr></thead><tbody>"
 
     entries.forEach(entry => {
-        text += `<tr><td style="padding-right:20px;">${entry.fileName}</td><td style="padding-right:20px;">${entry.page}</td><td>${entry.terms.join(", ")}</td><td>${entry.weight}</td><td><a href=${window.URL.createObjectURL(entry.pdf)} target="_blank">Show</a></tr>`
+        text += `<tr><td style="padding-right:20px;">${entry.fileName}</td><td style="padding-right:20px;">${entry.page}</td><td>${entry.terms.join(", ")}</td><td>${entry.weight}</td><td><a class="archor-link" href=${window.URL.createObjectURL(entry.pdf)} target="_blank">Show</a></tr>`
     })
 
     text += "</tbody></table>"
